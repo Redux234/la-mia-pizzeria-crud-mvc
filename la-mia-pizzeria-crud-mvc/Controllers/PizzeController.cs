@@ -55,9 +55,9 @@ namespace la_mia_pizzeria_crud_mvc.Controllers
                 CategoriaView modelForView = new CategoriaView();
                 modelForView.Pizza = new Pizze();
                 modelForView.Categorie = categorieDb;
-                
-            
-                return View("Create", modelForView);
+
+
+                return View("Crea", modelForView);
             }
 
         }
@@ -67,19 +67,22 @@ namespace la_mia_pizzeria_crud_mvc.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(CategoriaView formData)
         {
+            using PizzeriaContext db = new();
+
             if (!ModelState.IsValid)
             {
-                using (PizzeriaContext db = new PizzeriaContext())
-                {
-                    List<Categoria> categorie = db.Categorie.ToList<Categoria>();
-                    formData.Categorie = categorie;
-                }
 
 
-                return View("Create", formData);
+                List<Categoria> categorie = db.Categorie.ToList<Categoria>();
+                formData.Categorie = categorie;
+
+
+
+                return View("Crea", formData);
             }
 
-            
+            db.Add(formData.Pizza);
+            db.SaveChanges();
 
             return RedirectToAction("Index");
         }
@@ -138,7 +141,7 @@ namespace la_mia_pizzeria_crud_mvc.Controllers
                     PizzaToUpdate.Descrizione = formData.Pizza.Descrizione;
                     PizzaToUpdate.Immagine = formData.Pizza.Immagine;
                     PizzaToUpdate.CategoriaId = formData.Pizza.CategoriaId;
-                    
+
 
                     db.SaveChanges();
 
@@ -152,7 +155,7 @@ namespace la_mia_pizzeria_crud_mvc.Controllers
 
         }
 
-        [HttpPost]  
+        [HttpPost]
         public IActionResult Delete(int id)
         {
             using (PizzeriaContext db = new PizzeriaContext())
@@ -163,7 +166,7 @@ namespace la_mia_pizzeria_crud_mvc.Controllers
                 {
                     db.Pizza.Remove(PizzaToDelete);
                     db.SaveChanges();
-                    
+
                     return Index();
                 }
                 else
